@@ -75,3 +75,4 @@ const styles = StyleSheet.create({
   status: { marginTop: 6, fontSize: 12, fontWeight: '600' },
   synced: { color: 'green' },
   pending: { color: '#c77700' },
+  });
