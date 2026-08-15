@@ -1,42 +1,12 @@
-// import NetInfo from '@react-native-community/netinfo';
-// import { useInspectionStore } from './useInspectionStore';
-// import { syncAllPending } from './sync';
-
-// const API_URL = 'http://localhost:4000';
-
-// // Fetches the vehicle list from the server and stores it.
-// export async function loadVehicles() {
-//   try {
-//     const res = await fetch(`${API_URL}/vehicles`);
-//     const vehicles = await res.json();
-//     useInspectionStore.getState().setVehicles(vehicles);
-//   } catch (error) {
-//     // No connection at startup — that's fine, we just show an empty list
-//     // until connection returns. Vehicles aren't critical to have offline
-//     // since the brief doesn't require creating NEW vehicles offline.
-//     console.log('Could not load vehicles (likely offline):', error);
-//   }
-// }
-
-// // Call this once when the app starts.
-// export function initApp() {
-//   loadVehicles();
-//   syncAllPending(); // try syncing anything left over from last time
-
-//   // Whenever the connection comes back, try syncing again automatically.
-//   NetInfo.addEventListener((state) => {
-//     if (state.isConnected) {
-//       syncAllPending();
-//     }
-//   });
-// }
-
 import NetInfo from '@react-native-community/netinfo';
 import { useInspectionStore } from './useInspectionStore';
 import { syncAllPending } from './sync';
 
 const API_URL = 'http://localhost:4000';
 
+// Silently continue if this fails — a driver opening the app fully
+// offline for the first time will just see an empty vehicle list rather
+// than a hard error. This is a known limitation, documented in the write-up.
 export async function loadVehicles() {
   try {
     const res = await fetch(`${API_URL}/vehicles`);

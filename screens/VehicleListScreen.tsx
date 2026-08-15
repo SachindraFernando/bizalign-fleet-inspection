@@ -9,6 +9,11 @@ export default function VehicleListScreen({ onSelectVehicle }: Props) {
   const vehicles = useInspectionStore((state) => state.vehicles);
   const inspections = useInspectionStore((state) => state.inspections);
 
+  // Derives a per-vehicle status label from the local inspections list.
+  // A vehicle with no inspections shows nothing. One still pending/syncing/
+  // failed shows "Waiting to sync"; once every inspection for that vehicle
+  // is confirmed synced, it shows "Synced". This is what lets a driver see
+  // at a glance what still needs to go through, per the brief's requirement.
   function getStatusLabel(vehicleId: string) {
     const vehicleInspections = inspections.filter(
       (i) => i.vehicleId === vehicleId
@@ -30,6 +35,9 @@ export default function VehicleListScreen({ onSelectVehicle }: Props) {
         renderItem={({ item }) => {
           const status = getStatusLabel(item.id);
           return (
+            // Tapping a vehicle always opens a fresh inspection form —
+            // multiple inspections per vehicle are allowed (see write-up
+            // for reasoning), there's no "edit" or "view past" flow yet.
             <Pressable style={styles.card} onPress={() => onSelectVehicle(item)}>
               <Text style={styles.registration}>{item.registration}</Text>
               <Text style={styles.model}>
@@ -67,4 +75,3 @@ const styles = StyleSheet.create({
   status: { marginTop: 6, fontSize: 12, fontWeight: '600' },
   synced: { color: 'green' },
   pending: { color: '#c77700' },
-});

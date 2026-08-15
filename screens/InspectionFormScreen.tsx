@@ -27,6 +27,9 @@ const CHECKS = [
 ] as const;
 
 export default function InspectionFormScreen({ vehicle, onDone }: Props) {
+  // All 6 checks default to "pass" — the assumption is a driver mostly
+  // reports exceptions rather than confirming everything is fine one by
+  // one. Documented as a judgement call in the write-up.
   const [answers, setAnswers] = useState({
     tyres: true,
     lights: true,
@@ -42,9 +45,12 @@ export default function InspectionFormScreen({ vehicle, onDone }: Props) {
   }
 
   function handleSubmit() {
+    // Saves locally first — always succeeds, regardless of network state.
     createInspection(vehicle.id, { ...answers, notes });
-    // Try syncing right away too (in case we have signal) —
-    // if not, it just stays "pending" and syncs later automatically.
+    // Then optimistically try syncing immediately, in case we do have a
+    // connection right now. If not, this call just fails quietly and the
+    // inspection stays "pending" — it'll be picked up automatically by
+    // the NetInfo listener or the periodic retry in store/init.ts.
     syncAllPending();
     onDone();
   }
