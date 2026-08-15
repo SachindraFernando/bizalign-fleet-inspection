@@ -37,6 +37,15 @@ async function getServerInspections(): Promise<{ id: string }[]> {
   return res.json();
 }
 
+// Pure function, easy to test in isolation — given the server's records
+// and our client ID, did our inspection actually make it through?
+export function hasSyncedToServer(
+  serverInspections: { clientId: string | null }[],
+  clientId: string
+): boolean {
+  return serverInspections.some((i) => i.clientId === clientId);
+}
+
 // Attempts to sync a single inspection to the server.
 async function syncOne(inspection: Inspection) {
   const store = useInspectionStore.getState();
@@ -62,7 +71,8 @@ async function syncOne(inspection: Inspection) {
     // fetch throws on timeout / dropped connection — this is the tricky case.
     // We don't actually know if the server saved it or not, so we check.
     const serverInspections = await getServerInspections().catch(() => []);
-    const madeIt = serverInspections.some((i) => i.id === inspection.id);
+    //const madeIt = serverInspections.some((i) => i.id === inspection.id);
+    const madeIt = hasSyncedToServer(serverInspections, inspection.id);
 
     if (madeIt) {
       // Phantom success case — it actually went through.
